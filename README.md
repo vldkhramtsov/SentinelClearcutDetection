@@ -9,11 +9,19 @@ This is a source code repository for downloading specified Sentinel-2 tiles and 
  * `model` - **TBD:** scripts for training U-Net segmentation model
 
 ## Setup: `sentinel_download`
-All dependencies are given in requirements.txt. To download the tiles, you need to put the `key.json` file (with your GCP key) in the `sentinel_download` path.
+The pipeline is the following:
+1. Download raw `.jp2` files.
+2. Preprocess and merge downloaded bands into the single `.tiff` file.
+3. Divide the resulting file into the pieces, keeping the regions of clearcuts only.
+4. Construct differences between pieces of images, separated by time.
 
-The tiles which should be downloaded are listed in `../data/tiles/tiles_time-dependent.txt`, but the actual file, containing names of tiles could be changed, correcting the `self.labeled_tiles_to_download` in `class SentinelDownload` (`sentinel_download.py`). The files will be downloaded into the `DOWNLOADED_IMAGES_DIR = path_exists_or_create('data/source_images/')`. Update `gcp_config.ini` to specify which tiles and which bands (10m, 20m) should be downloaded; the cloud masks (20m) are retrieved dy default with any set of the bands.
+To download the tiles, you have to put the `key.json` file (with your GCP key) in the `sentinel_download` path.
 
-Tiles are preprocessed (merging bands into `MODEL_TIFFS_DIR = path_exists_or_create('data/model_tiffs')`) and cropped into small pieces with `from prepare_tiff import preprocess` and `from prepare_pieces import PreparePieces` accordingly.
+The tiles which should be downloaded are listed in `../data/tiles/tiles_time-dependent.txt`, but the actual file, containing names of tiles could be changed, correcting the `self.labeled_tiles_to_download` in `class SentinelDownload` (`sentinel_download.py`). The files will be downloaded into the `DOWNLOADED_IMAGES_DIR = 'data/source_images/'`. Update `gcp_config.ini` to specify the names of tiles and bands (10m, 20m only) which should be downloaded; the cloud masks (20m) are retrieved dy default with any set of the bands.
+
+Tiles are preprocessed (merging bands into `MODEL_TIFFS_DIR = 'data/model_tiffs'`) and cropped into small pieces with `from prepare_tiff import preprocess` and `from prepare_pieces import PreparePieces` accordingly.
+
+All dependencies are given in requirements.txt. Possibly, you will not be able to use `gdal` features; to install the `gdal` program, we provide the `install_gdal.sh` script (for Ubuntu users).
 
 ## Dataset
 You can download our datasets directly from Google drive for the baseline and time-dependent models. The image tiles from Sentinel-2, which were used for our research, are listed in [this folder](https://nositeyet).
