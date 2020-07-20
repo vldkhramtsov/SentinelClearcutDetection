@@ -15,6 +15,53 @@ The pipeline (`sentinel_download/main.py`) is the following:
 3. Divide the resulting file into the pieces, keeping the regions of clearcuts only.
 4. Construct differences between pieces of images, separated by time.
 
+The structure of the local datafiles after running the pipeline will be the following:
+
+```
+sentinel_download
+|
+└── data
+    |
+    ├── source_images
+    │   ├── image_1_TCI.jp2
+    │   └── image_2_TCI.jp2
+    |
+    ├── model_tiffs
+    │   ├── image_1
+    │   │   ├── image_1_merged.tiff
+    │   │   └── clouds.tiff
+    │   └── image_2
+    │       ├── image_2_merged.tiff
+    │       └── clouds.tiff
+    |
+    ├── output
+    │   ├── image_1
+    │   │   ├── full_mask.png
+    │   │   ├── image_pieces.csv
+    │   │   ├── image_1_merged.png
+    │   │   ├── images
+    │   │   ├── masks
+    │   │   ├── geojson_polygons
+    │   │   └── clouds
+    │   └── image_2
+    │       ├── full_mask.png
+    │       ├── image_pieces.csv
+    │       ├── image_2_merged.png
+    │       ├── images/
+    │       ├── masks/
+    │       ├── geojson_polygons/
+    │       └── clouds/
+    |
+    └── diff
+        ├── date1-date2/
+        ├── onlymasksplit/
+        ├── data_info.csv
+        ├── train_df.csv
+        ├── test_df.csv
+        └── valid_df.csv
+```
+The final result is stored in the diff directory, which contains fully prepared image differences with corresponding masks, and `*.csv` files with the names of images in the datasets.
+
 All main constants (directories, sizes of pieces, etc.) are initialized in the `sentinel_download/settings.py` file.
 
 To download the tiles, you have to put the `key.json` file (with your GCP key) in the `sentinel_download` path.
