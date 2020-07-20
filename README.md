@@ -9,11 +9,13 @@ This is a source code repository for downloading specified Sentinel-2 tiles and 
  * `model` - **TBD:** scripts for training U-Net segmentation model
 
 ## Setup: `sentinel_download`
-The pipeline is the following:
+The pipeline (`sentinel_download/main.py`) is the following:
 1. Download raw `.jp2` files.
 2. Preprocess and merge downloaded bands into the single `.tiff` file.
 3. Divide the resulting file into the pieces, keeping the regions of clearcuts only.
 4. Construct differences between pieces of images, separated by time.
+
+All main constants (directories, sizes of pieces, etc.) are initialized in the `sentinel_download/settings.py` file.
 
 To download the tiles, you have to put the `key.json` file (with your GCP key) in the `sentinel_download` path.
 
