@@ -39,10 +39,10 @@ sentinel_download
     │   │   ├── full_mask.png
     │   │   ├── image_pieces.csv
     │   │   ├── image_1_merged.png
-    │   │   ├── images
-    │   │   ├── masks
-    │   │   ├── geojson_polygons
-    │   │   └── clouds
+    │   │   ├── images/
+    │   │   ├── masks/
+    │   │   ├── geojson_polygons/
+    │   │   └── clouds/
     │   └── image_2
     │       ├── full_mask.png
     │       ├── image_pieces.csv
@@ -60,7 +60,7 @@ sentinel_download
         ├── test_df.csv
         └── valid_df.csv
 ```
-The final result is stored in the diff directory, which contains fully prepared image differences with corresponding masks, and `*.csv` files with the names of images in the datasets.
+The final result is stored in the `diff` directory, which contains fully prepared image differences with corresponding masks, and `*.csv` files with the names of images in the datasets.
 
 All main constants (directories, sizes of pieces, etc.) are initialized in the `sentinel_download/settings.py` file.
 
