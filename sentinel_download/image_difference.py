@@ -123,8 +123,8 @@ class ImageDifference:
             else:
                 continue
 
-            is_clouds_current = np.sum(clouds['current']) / clouds['current'].size < 0.2
-            is_clouds_previous = np.sum(clouds['previous']) / clouds['previous'].size < 0.2
+            is_clouds_current = np.sum(clouds['current']) / clouds['current'].size < settings.MAXIMUM_CLOUD_PERCENTAGE_ALLOWED
+            is_clouds_previous = np.sum(clouds['previous']) / clouds['previous'].size < settings.MAXIMUM_CLOUD_PERCENTAGE_ALLOWED
             if is_clouds_current and is_clouds_previous:
                 images['previous'] = match_histograms(images['current'],
                                                       images['previous'],
@@ -164,7 +164,7 @@ class ImageDifference:
         tiles = tiles.sort_values(['img_date'], ascending=False)
 
         infofile = os.path.join(self.save_path, 'data_info.csv')
-        """
+
         markups = [gp.read_file(os.path.join(self.polys_path, shp)) for shp in os.listdir(self.polys_path)]
         for shp in markups:
             shp['img_date'] = shp['img_date'].apply(
@@ -207,7 +207,7 @@ class ImageDifference:
                             self.imgdiff(tiles['tileID'].iloc[index_current],
                                          tiles['tileID'].iloc[index_previous],
                                          diff_path, writer)
-        """     
+     
         df = pd.read_csv(infofile)
         xy = df['position'].unique()
         

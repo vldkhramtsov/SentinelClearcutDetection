@@ -162,7 +162,7 @@ class PreparePieces:
             # to [-1; 1]
             clouds = np.clip(clouds, 0, 100)
             clouds = (clouds/100 * 2 - 1)
-            # clouds = img_as_ubyte(clouds)
+            clouds = img_as_ubyte(clouds)
             for i in range(pieces_info.shape[0]):
                 piece = pieces_info.loc[i]
                 piece_cloud = clouds[

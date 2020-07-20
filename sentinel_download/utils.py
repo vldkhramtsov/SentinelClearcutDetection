@@ -3,6 +3,8 @@ Script helpers
 """
 import os
 from enum import Enum
+import numpy as np
+import settings
 
 def read_labeled_tiles(file):
     tiles = []
@@ -32,4 +34,4 @@ def date_limit(date, shp):
     return date >= shp['img_date'].min() and date <= shp['img_date'].max()
 
 def image_non_zero(image_array):
-    return np.count_nonzero(image_array) > image_array.size * (1 - MAXIMUM_EMPTY_PIXEL_PERCENTAGE)
+    return np.count_nonzero(image_array) > image_array.size * (1 - settings.MAXIMUM_EMPTY_PIXEL_PERCENTAGE)
