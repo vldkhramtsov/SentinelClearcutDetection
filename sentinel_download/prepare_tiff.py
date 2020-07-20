@@ -5,6 +5,7 @@ import imageio
 import rasterio
 import numpy as np
 
+from configparser import ConfigParser
 from tqdm import tqdm
 
 from utils import path_exists_or_create
@@ -43,41 +44,60 @@ def scale_img(img_file, output_file=None, min_value=0, max_value=255, output_typ
         )
 
 def prepare_tiff(filename):
+    config = ConfigParser(allow_no_value=True)
+    config.read('gcp_config.ini')
+    bands_to_download = config.get('config', 'BANDS_TO_DOWNLOAD').split()
+
     save_path = path_exists_or_create(join(MODEL_TIFFS_DIR, f"{filename}"))
-    
-    to_tiff(join(DOWNLOADED_IMAGES_DIR, f'{filename}{ROOT}_TCI.jp2'), 
-                 join(save_path, f'{filename}_TCI.tif'), 'Byte')
     output_tiffs = {}
-    for band in ['B04', 'B08', 'B8A', 'B11', 'B12']:
+    bands_to_convert = [band for band in bands_to_download]
+
+    if 'TCI' in bands_to_download:
+        output_tiffs['tiff_rgb_name'] = join(save_path, f'{filename}_TCI.tif')
+        to_tiff(join(DOWNLOADED_IMAGES_DIR, f'{filename}{ROOT}_TCI.jp2'), 
+                join(save_path, f'{filename}_TCI.tif'), 'Byte')
+        bands_to_convert.remove('TCI')
+
+    for band in bands_to_convert:
         output_tiffs[f'tiff_{band}_name'] = join(save_path, f'{filename}_{band}.tif')
         to_tiff(join(DOWNLOADED_IMAGES_DIR, f'{filename}{ROOT}_{band}.jp2'),
                 output_tiffs[f'tiff_{band}_name'])
 
-    output_tiffs['tiff_rgb_name'] = join(save_path, f'{filename}_TCI.tif')
-    output_tiffs['tiff_ndvi_name'] = join(save_path, f'{filename}_ndvi.tif')
-    output_tiffs['tiff_ndmi_name'] = join(save_path, f'{filename}_ndmi.tif')
 
-    print('\nndvi band is processing...')
-    get_ndvi(output_tiffs.get('tiff_B04_name'),
-             output_tiffs.get('tiff_B08_name'),
-             output_tiffs.get('tiff_ndvi_name'))
+    if 'B04' in bands_to_download and 'B08' in bands_to_download:
+        output_tiffs['tiff_ndvi_name'] = join(save_path, f'{filename}_ndvi.tif')
+        print('\nndvi band is processing...')
+        get_ndvi(output_tiffs.get('tiff_B04_name'),
+                output_tiffs.get('tiff_B08_name'),
+                output_tiffs.get('tiff_ndvi_name'))
+        bands_to_convert.append('ndvi')
+    
+    if 'B11' in bands_to_download and 'B8A' in bands_to_download:
+        output_tiffs['tiff_ndmi_name'] = join(save_path, f'{filename}_ndmi.tif')
+        print('\nndmi band is processing...')
+        get_ndvi(output_tiffs.get('tiff_B11_name'),
+                output_tiffs.get('tiff_B8A_name'),
+                output_tiffs.get('tiff_ndmi_name'))
+        bands_to_convert.append('ndmi')
 
-    print('\nndmi band is processing...')
-    get_ndvi(output_tiffs.get('tiff_B11_name'),
-             output_tiffs.get('tiff_B8A_name'),
-             output_tiffs.get('tiff_ndmi_name'))
-
-    for band in ['B04', 'B08', 'B8A', 'B11', 'B12', 'ndvi', 'ndmi']:
+    for band in bands_to_convert:
         output_tiffs[f'scaled_{band}_name'] = f"{output_tiffs[f'tiff_{band}_name']}_scaled.tif"
         scale_img(output_tiffs[f'tiff_{band}_name'], output_tiffs[f'scaled_{band}_name'])
 
     tiff_output_name = join(save_path, f'{filename}_merged.tiff')
+    
+    if 'B04' in bands_to_download:
+        bands_to_convert.remove('B04')
+    # if 'TCI' in bands_to_download:
+    #    bands_to_convert = [output_tiffs['tiff_rgb_name']] + bands_to_convert
+    
+    files_to_merge = [output_tiffs.get(f'scaled_{band}_name') for band in bands_to_convert]
+    files_to_merge = [output_tiffs['tiff_rgb_name']] + files_to_merge
+    merged_files = " ".join(files_to_merge)
+
+    print(merged_files)
     os.system(
-        f"gdal_merge.py -separate -o {tiff_output_name} \
-        {output_tiffs.get('tiff_rgb_name')} \
-        {output_tiffs.get('scaled_B08_name')} {output_tiffs.get('scaled_B8A_name')} \
-        {output_tiffs.get('scaled_B11_name')} {output_tiffs.get('scaled_B12_name')} \
-        {output_tiffs.get('scaled_ndvi_name')} {output_tiffs.get('scaled_ndmi_name')}"
+        f"gdal_merge.py -separate -o {tiff_output_name} {merged_files}"
     )
 
     to_tiff(join(DOWNLOADED_IMAGES_DIR, f'{filename}{ROOT}_MSK_CLDPRB_20m.jp2'),

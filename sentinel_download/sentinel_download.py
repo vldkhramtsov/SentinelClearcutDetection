@@ -25,7 +25,7 @@ class SentinelDownload:
         self.area_tile_set = self.config.get('config', 'AREA_TILE_SET').split()
         self.bands_to_download = self.config.get('config', 'BANDS_TO_DOWNLOAD').split()
         self.executor = ThreadPoolExecutor(max_workers=10)
-        self.labeled_tiles_to_download = read_labeled_tiles('../data/tiles/tiles_time-dependent.txt')
+        self.labeled_tiles_to_download = read_labeled_tiles('../data/tiles/example.txt')
 
     def process_download(self):
         """
@@ -33,6 +33,7 @@ class SentinelDownload:
         Requests metadata file to define if update is needed for tile
         Launches multithread download
         """
+        print('start')
         tiles_and_uris_dict = self.tile_uri_composer()
         tiles_to_update = self.request_google_cloud_storage_for_latest_acquisition(tiles_and_uris_dict)
         self.launch_download_pool(tiles_to_update)

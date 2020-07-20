@@ -60,7 +60,6 @@ class PreparePieces:
                                       transform=image.transform,
                                       default_value=255)
 
-        image.close()
         if filter_by_date:
             filename = '{}/{}.png'.format(
                 data_path,
@@ -96,7 +95,7 @@ class PreparePieces:
                     is_mask = full_mask[j * self.height: j * self.height + self.height,
                                         i * self.width:  i * self.width  + self.width].sum() > 0
                     
-                    if image_non_zero and is_mask:
+                    if image_non_zero(image_array) and is_mask:
                         image_format = 'tiff'
                         piece_name = f'{filename}_{j}_{i}.{image_format}'
 
@@ -123,13 +122,9 @@ class PreparePieces:
                             for ix in range(image_array.shape[2]):
                                 dst.write(image_array[:, :, ix], ix + 1)
 
-                            dst.close()
-
                         writer.writerow([filename, piece_name, piece_geojson_name,
                                          i * self.width, j * self.height, 
                                          self.width, self.height])
-        src.close()
-        csvFile.close()
 
     def split_mask(self, mask_path, save_mask_path, image_pieces_path):
         pieces_info = pd.read_csv(
@@ -167,7 +162,7 @@ class PreparePieces:
             # to [-1; 1]
             clouds = np.clip(clouds, 0, 100)
             clouds = (clouds/100 * 2 - 1)
-            clouds = img_as_ubyte(clouds)
+            # clouds = img_as_ubyte(clouds)
             for i in range(pieces_info.shape[0]):
                 piece = pieces_info.loc[i]
                 piece_cloud = clouds[
@@ -179,9 +174,8 @@ class PreparePieces:
                     re.split(r'[/.]', piece['piece_image'])[-2]
                 )
                 imageio.imwrite(filename_cloud, piece_cloud)
-        cld.close()
 
-    def preprocess(self):
+    def process(self):
         for filename in os.listdir(self.tiff_path):
             data_path = path_exists_or_create(os.path.join(PIECES_DIR, filename))
             image_path = os.path.join(self.tiff_path, filename, f"{filename}_merged.tiff")
