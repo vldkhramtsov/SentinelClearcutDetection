@@ -84,6 +84,3 @@ The files contain the following columns: `tileID` (ID of a tile, which was annot
 
 ## Training
 **TBD**
-
-## Questions
-If you have questions after reading README, please email to [Vladyslav Khramtsov](mailto:v.khramtsov@quantumobile.com).
