@@ -61,7 +61,7 @@ python-dateutil==2.8.1
 pytz==2020.1
 pyu2f==0.1.4
 PyWavelets==1.1.1
-PyYAML==5.1.1
+PyYAML==5.4
 rasterio==1.1.2
 requests==2.24.0
 retry-decorator==1.1.1
