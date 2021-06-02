@@ -78,6 +78,6 @@ SocksiPy-branch==1.1
 tifffile==2020.6.3
 tqdm==4.19.9
 uritemplate==3.0.1
-urllib3==1.25.9
+urllib3==1.26.5
 utm==0.5.0
 zipp==3.1.0
